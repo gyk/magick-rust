@@ -35,7 +35,10 @@ pub const PATH_SEPARATOR: &str = match cfg!(target_os = "windows") {
 };
 
 fn main() {
-    let check_cppflags = Command::new("MagickCore-config").arg("--cppflags").output();
+    let check_cppflags = Command::new("bash")
+        .arg("MagickCore-config")
+        .arg("--cppflags")
+        .output();
     if let Ok(ok_cppflags) = check_cppflags {
         let cppflags = ok_cppflags.stdout;
         let cppflags = String::from_utf8(cppflags).unwrap();
