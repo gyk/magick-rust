@@ -11,6 +11,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: /opt/magick
+          key: ${{ runner.os }}-ImageMagick-${{ env.MAGICK_VERSION }}
       - name: Install dependencies
         id: deps
         run: |
@@ -25,11 +30,6 @@ jobs:
           echo "========"
           pkg-config --exists MagickWand "MagickWand >= 7.0"
           echo "check_magick=$?" >> $GITHUB_OUTPUT
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v3
-        with:
-          path: /opt/magick
-          key: ${{ runner.os }}-ImageMagick-${{ env.MAGICK_VERSION }}
       - name: Build ImageMagick
         if: ${{ steps.deps.outputs.check_magick != '0' }}
         run: |
