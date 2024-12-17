@@ -1,0 +1,50 @@
+name: Run tests
+
+on:
+  workflow_dispatch:
+
+env:
+  MAGICK_VERSION: 7.1.1-41
+  PKG_CONFIG_PATH: /opt/magick/lib/pkgconfig
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v3
+        with:
+          path: /opt/magick
+          key: ${{ runner.os }}-ImageMagick-${{ env.MAGICK_VERSION }}
+      - name: Install dependencies
+        id: deps
+        run: |
+          sudo apt update
+          sudo apt install -y --no-install-recommends clang pkg-config
+          sudo mkdir -p /opt/magick/lib
+          sudo ldconfig /opt/magick/lib
+          echo "/opt/magick/bin" >> $GITHUB_PATH
+          set +e
+          pkg-config --exists MagickWand "MagickWand >= 7.0"
+          echo "check_magick=$?" >> $GITHUB_OUTPUT
+      - name: Build ImageMagick
+        if: ${{ steps.deps.outputs.check_magick != '0' }}
+        run: |
+          curl -LO "https://github.com/ImageMagick/ImageMagick/archive/refs/tags/${MAGICK_VERSION}.tar.gz"
+          tar xf "${MAGICK_VERSION}.tar.gz"
+          cd ImageMagick-7.*
+          ./configure CFLAGS="-O0" --prefix=/opt/magick --enable-shared --disable-static --disable-dpc --disable-openmp --with-quantum-depth=8 --disable-hdri --without-modules --without-utilities --disable-deprecated --disable-docs --with-bzlib=no --with-autotrace=no --with-djvu=no --with-dps=no --with-fftw=no --with-flif=no --with-fpx=no --with-fontconfig=no --with-freetype=no --with-gslib=no --with-gvc=no --with-heic=no --with-jbig=no --with-jpeg=no --with-jxl=no --with-dmr=no --with-lcms=no --with-lqr=no --with-lzma=no --with-magick-plus-plus=no --with-openexr=no --with-openjp2=no --with-pango=no --with-perl=no --with-png=no --with-raqm=no --with-raw=no --with-rsvg=no --with-tiff=no --with-webp=no --with-wmf=no --with-x=no --with-xml=no --with-zip=no --with-zlib=no --with-zstd=no
+          make
+          sudo make install
+          sudo ldconfig /opt/magick/lib
+      - name: Check ImageMagick
+        run: |
+          echo ${{ steps.deps.outputs.check_magick }}
+          pkg-config --libs MagickWand "MagickWand >= 7.0"
+          MagickCore-config --cppflags
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+      - name: Test
+        run: |
+          cargo test test_new_drop -- --nocapture
