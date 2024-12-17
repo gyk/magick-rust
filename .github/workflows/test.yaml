@@ -37,7 +37,8 @@ jobs:
           curl -LO "https://github.com/ImageMagick/ImageMagick/archive/refs/tags/${MAGICK_VERSION}.tar.gz"
           tar xf "${MAGICK_VERSION}.tar.gz"
           cd ImageMagick-7.*
-          ./configure CFLAGS="-O0" --prefix=/opt/magick --enable-shared --disable-static --disable-dpc --disable-openmp --with-quantum-depth=8 --disable-hdri --without-modules --without-utilities --disable-deprecated --disable-docs --with-bzlib=no --with-autotrace=no --with-djvu=no --with-dps=no --with-fftw=no --with-flif=no --with-fpx=no --with-fontconfig=no --with-freetype=no --with-gslib=no --with-gvc=no --with-heic=no --with-jbig=no --with-jpeg=no --with-jxl=no --with-dmr=no --with-lcms=no --with-lqr=no --with-lzma=no --with-magick-plus-plus=no --with-openexr=no --with-openjp2=no --with-pango=no --with-perl=no --with-png=no --with-raqm=no --with-raw=no --with-rsvg=no --with-tiff=no --with-webp=no --with-wmf=no --with-x=no --with-xml=no --with-zip=no --with-zlib=no --with-zstd=no
+          export CC="gcc -O0"
+          ./configure --prefix=/opt/magick --enable-shared --disable-static --disable-dpc --disable-openmp --with-quantum-depth=8 --disable-hdri --without-modules --without-utilities --disable-deprecated --disable-docs --with-bzlib=no --with-autotrace=no --with-djvu=no --with-dps=no --with-fftw=no --with-flif=no --with-fpx=no --with-fontconfig=no --with-freetype=no --with-gslib=no --with-gvc=no --with-heic=no --with-jbig=no --with-jpeg=no --with-jxl=no --with-dmr=no --with-lcms=no --with-lqr=no --with-lzma=no --with-magick-plus-plus=no --with-openexr=no --with-openjp2=no --with-pango=no --with-perl=no --with-png=no --with-raqm=no --with-raw=no --with-rsvg=no --with-tiff=no --with-webp=no --with-wmf=no --with-x=no --with-xml=no --with-zip=no --with-zlib=no --with-zstd=no
           make
           sudo make install
           sudo ldconfig /opt/magick/lib
