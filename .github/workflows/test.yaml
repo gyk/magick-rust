@@ -26,10 +26,14 @@ jobs:
           echo "/opt/magick/bin" >> $GITHUB_PATH
           set +e
           pkg-config --exists MagickWand "MagickWand >= 7.0"
+          echo "check_magick=$?"
+          echo "========"
+          pkg-config --exists MagickWand "MagickWand >= 7.0"
           echo "check_magick=$?" >> $GITHUB_OUTPUT
       - name: Build ImageMagick
         if: ${{ steps.deps.outputs.check_magick != '0' }}
         run: |
+          echo ":::: check_magick" ${{ steps.deps.outputs.check_magick != '0' }}
           curl -LO "https://github.com/ImageMagick/ImageMagick/archive/refs/tags/${MAGICK_VERSION}.tar.gz"
           tar xf "${MAGICK_VERSION}.tar.gz"
           cd ImageMagick-7.*
